@@ -2006,7 +2006,8 @@ items = resHolder["//m:tGameInfo"]
 if (items.length == 5)
    return true
 else
-   return false</scriptText></con:configuration></con:assertion><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:testSuite name="XmlParser Test"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Test Parser" searchProperties="true" id="31a721ab-ca5a-4fab-bd57-749a628fff91"><con:settings/><con:testStep type="request" name="Get Cities"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>InfoSoapBinding</con:interface><con:operation>Cities</con:operation><con:request name="Get Cities"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://footballpool.dataaccess.eu/data/info.wso</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:foot="http://footballpool.dataaccess.eu">
+   return false</scriptText></con:configuration></con:assertion><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:testSuite name="JDOM Reader Test"><con:description>This test suite demonstrates using JDOM and XPATH to get the contents
+of a message. See the validation steps of the Get Cities call</con:description><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="JDOM Read" searchProperties="true" id="31a721ab-ca5a-4fab-bd57-749a628fff91"><con:settings/><con:testStep type="request" name="Get Cities"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>InfoSoapBinding</con:interface><con:operation>Cities</con:operation><con:request name="Get Cities"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://footballpool.dataaccess.eu/data/info.wso</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:foot="http://footballpool.dataaccess.eu">
    <soapenv:Header/>
    <soapenv:Body>
       <foot:Cities/>
@@ -2018,107 +2019,38 @@ items = resHolder["//m:string"]
 if (items.length == 8)
    return true
 else
-   return false</scriptText></con:configuration></con:assertion><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="groovy" name="Testbed"><con:settings/><con:config><script><![CDATA[import java.io.*
-import org.jdom.*
-import org.jdom.input.*
-import org.jdom.xpath.*
-import org.jdom.output.*
-import org.xml.sax.*
-def xhtml = """<html
-xmlns:html="http://www.w3.org/1999/xhtml"
-xmlns:myns="http://www.w3.org/1999/xhtml"
->
-<head><title>Namespace Prefix Test</title></head>
-<body>
-<span>prefix:default</span>
-<html:span>prefix:html</html:span>
-<myns:span>prefix:myns</myns:span>
-</body>
-</html>"""
-def xpaths = [
-"" : "//span",
-"html" : "//html:span",
-"myns" : "//myns:span"
-]
-//def builder = new SAXBuilder( "org.ccil.cowan.tagsoup.Parser" )
-def builder = new SAXBuilder()
-def outputter = new XMLOutputter()
-def is = new InputSource( new ByteArrayInputStream( xhtml.bytes ) )
-def doc = builder.build( is )
-log.info "input:\n" + xhtml
-log.info  "output:\n" + outputter.outputString( doc )
-log.info  "result:\n"
-xpaths.each { prefix, path ->
-log.info  "namespace prefix: \"${prefix}\"; xpath: \"${path}\""
-def xpath = XPath.newInstance( path )
-def result = xpath.selectNodes( doc )
-result.each { log.info  " " + outputter.outputString( it ) }
-}]]></script></con:config></con:testStep><con:testStep type="groovy" name="Parser Code"><con:settings/><con:config><script>import groovy.xml.dom.DOMCategory
-import groovy.xml.DOMBuilder
-import groovy.xml.QName	
-import groovy.xml.Namespace
-import javax.xml.xpath.*
-import javax.xml.parsers.DocumentBuilderFactory
- 
+   return false</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" name="JDOM Assertion"><con:configuration><scriptText>import java.io.InputStream
+import org.jdom.Document
+import org.jdom.input.SAXBuilder
+import org.jdom.xpath.XPath
+import org.jdom.output.XMLOutputter
+import org.xml.sax.InputSource
+/*  
+ * This test used JDOM and XPATH to get
+ * at the contents of the response 
+ */
 
-
-
+//http://www.jdom.org/docs/apidocs.1.1/org/jdom/xpath/XPath.html
 // get response text for retrieveEvents response
 def listOfCitiesText = context.expand( '${Get Cities#Response}' )
-// parse
-def resObj = new XmlParser().parseText(listOfCitiesText)
-// define namespaces
-def soap  = new Namespace("http://schemas.xmlsoap.org/soap/envelope/",'soap')
-def footns = new Namespace("http://footballpool.dataaccess.eu",'m')
-// get the responses
-def citiesItems =  resObj[soap.Body][footns.CitiesResponse][footns.CitiesResult][footns.string]
-//log.info citiesItems
 
-citiesItems.each
-{
-	//log.info it.text()
-}
-// https://gist.github.com/inno-v/5650523
-// now use xpath
-def factory = DocumentBuilderFactory.newInstance();
-factory.setNamespaceAware(true);
-def builder     = factory.newDocumentBuilder()
-def inputStream = new ByteArrayInputStream(listOfCitiesText.bytes)
-def records     = builder.parse(inputStream).documentElement 
-records.normalize()
-// log.info records.childNodes.item(1).childNodes.item(1)
-def xpath = XPathFactory.newInstance().newXPath()
-def expr = xpath.compile('local-name = "fred"');
-log.info listOfCitiesText
-def result = expr.evaluate(records, XPathConstants.NODESET);
-log.info result.length
+def builder = new SAXBuilder()
+def outputter = new XMLOutputter()
+def is = new InputSource( new ByteArrayInputStream( listOfCitiesText.bytes ) )
+def doc = builder.build( is )
  
-result.each{ 
-	log.info it.text()
-}
+//log.info  "output:\n" + outputter.outputString( doc )
+//log.info  "result:\n"
+def xpath = XPath.newInstance( "//m:CitiesResponse/m:CitiesResult/m:string" )
+xpath.addNamespace("m","http://footballpool.dataaccess.eu")
 
-return  
-</script></con:config></con:testStep><con:testStep type="request" name="Get Games For Kiev"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>InfoSoapBinding</con:interface><con:operation>GamesPerCity</con:operation><con:request name="Get Games For Kiev"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://footballpool.dataaccess.eu/data/info.wso</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:foot="http://footballpool.dataaccess.eu">
-   <soapenv:Header/>
-   <soapenv:Body>
-      <foot:GamesPerCity>
-         <foot:sCityName>Kiev</foot:sCityName>
-      </foot:GamesPerCity>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response"/><con:assertion type="SOAP Fault Assertion"/><con:assertion type="GroovyScriptAssertion" name="Script Assertion"><con:configuration><scriptText>//import groovy.xml.dom.DOMCategory
-//import groovy.xml.DOMBuilder
-//import groovy.xml.QName	
-
- 
-	
-def groovyUtils = new com.eviware.soapui.support.GroovyUtils(context)
-def resHolder = groovyUtils.getXmlHolder( "Get Games For Kiev#Response" )
- 
-items = resHolder["//m:tGameInfo"]
-if (items.length == 5)
-   return true
+def result = xpath.selectNodes( doc )
+log.info result.size
+//result.each { log.info  " --" + outputter.outputString( it ) }
+if (result.size == 8)
+	return true
 else
-   return false</scriptText></con:configuration></con:assertion><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="groovy" name="My Testbed"><con:settings/><con:config><script>import java.io.InputStream
+     return false</scriptText></con:configuration></con:assertion><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="groovy" name="My Testbed"><con:settings/><con:config><script>import java.io.InputStream
 import org.jdom.Document
 import org.jdom.input.SAXBuilder
 import org.jdom.xpath.XPath
@@ -2136,11 +2068,12 @@ def doc = builder.build( is )
  
 log.info  "output:\n" + outputter.outputString( doc )
 log.info  "result:\n"
-def xpath = XPath.newInstance( "//m:CitiesResponse/m:CitiesResult" )
+def xpath = XPath.newInstance( "//m:CitiesResponse/m:CitiesResult/m:string" )
 xpath.addNamespace("m","http://footballpool.dataaccess.eu")
 
 def result = xpath.selectNodes( doc )
-result.each { log.info  " --" + outputter.outputString( it ) }
+log.info result.size
+//result.each { log.info  " --" + outputter.outputString( it ) }
 
 return
  
